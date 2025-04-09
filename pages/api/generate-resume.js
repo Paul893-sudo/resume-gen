@@ -10,30 +10,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const openaiRes = await fetch("https://api.openai.com/v1/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "text-davinci-003",
-        prompt: prompt,
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: "Ты профессиональный HR-специалист, который пишет деловые резюме на русском языке." },
+          { role: "user", content: prompt }
+        ],
         temperature: 0.7,
         max_tokens: 1000,
       }),
     });
 
-    const data = await openaiRes.json();
+    const data = await response.json();
 
-    if (data?.choices?.[0]?.text) {
-      return res.status(200).json({ result: data.choices[0].text });
+    if (data?.choices?.[0]?.message?.content) {
+      return res.status(200).json({ result: data.choices[0].message.content });
     } else {
-      console.error("OpenAI response:", JSON.stringify(data)); // 💥 Покажет в логах причину
+      console.error("OpenAI response:", JSON.stringify(data));
       return res.status(500).json({ result: "Ошибка генерации OpenAI (response empty)" });
     }
   } catch (error) {
-    console.error("OpenAI error:", error); // 💥 Покажет ошибку в логах
-    return res.status(500).json({ result: "Ошибка сервера при запросе к OpenAI" });
+    console.error("OpenAI error:", error);
+    return res.status(500).json({ result: "Ошибка сервера при обращении к OpenAI" });
   }
 }
