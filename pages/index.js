@@ -10,48 +10,36 @@ export default function ResumeGen() {
   });
 
   const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const generateResume = async () => {
-    setLoading(true);
-    setResult("");
-
-    const prompt = `Сгенерируй профессиональное, деловое резюме на русском языке на основе следующих данных:
+  const generateResume = () => {
+    const resume = `РЕЗЮМЕ
 
 ФИО: ${form.fullName}
 Профессия: ${form.profession}
-Опыт работы: ${form.experience}
-Образование: ${form.education}
-Навыки: ${form.skills}
 
-Резюме должно быть оформлено в структурированном виде, с разделами, без лишней воды, но с грамотными формулировками.`;
+Опыт работы:
+${form.experience || "• Опыт работы будет подставлен сюда..."}
 
-    try {
-      const res = await fetch("/api/generate-resume", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
+Образование:
+${form.education || "• Укажите информацию об образовании."}
 
-      const data = await res.json();
-      setResult(data.result || "Ошибка генерации");
-    } catch (err) {
-      setResult("Произошла ошибка при генерации резюме.");
-    }
+Навыки:
+${form.skills || "• Ваши ключевые навыки."}
 
-    setLoading(false);
+Цель:
+Хочу применить свои знания и опыт в компании, где ценятся профессионализм и развитие.`;
+
+    setResult(resume);
   };
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
       <h1 style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}>
-        ResumeGen — Генератор Резюме
+        ResumeGen — Генератор Резюме (без ИИ)
       </h1>
 
       <input name="fullName" placeholder="ФИО" onChange={handleChange} />
@@ -60,8 +48,8 @@ export default function ResumeGen() {
       <textarea name="education" placeholder="Образование" rows={3} onChange={handleChange} />
       <textarea name="skills" placeholder="Ключевые навыки" rows={3} onChange={handleChange} />
 
-      <button onClick={generateResume} disabled={loading}>
-        {loading ? "Генерация..." : "Сгенерировать резюме"}
+      <button onClick={generateResume} style={{ marginTop: 10 }}>
+        Сгенерировать резюме
       </button>
 
       {result && (
