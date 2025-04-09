@@ -29,9 +29,11 @@ export default async function handler(req, res) {
     if (data?.choices?.[0]?.text) {
       return res.status(200).json({ result: data.choices[0].text });
     } else {
-      return res.status(500).json({ result: "Ошибка генерации OpenAI" });
+      console.error("OpenAI response:", JSON.stringify(data)); // 💥 Покажет в логах причину
+      return res.status(500).json({ result: "Ошибка генерации OpenAI (response empty)" });
     }
   } catch (error) {
-    res.status(500).json({ result: "Ошибка сервера при запросе к OpenAI" });
+    console.error("OpenAI error:", error); // 💥 Покажет ошибку в логах
+    return res.status(500).json({ result: "Ошибка сервера при запросе к OpenAI" });
   }
 }
